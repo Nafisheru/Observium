@@ -77,6 +77,36 @@ docker exec -it observium bash
 # Manual discovery
 docker exec -u www-data observium php /opt/observium/discovery.php -h all
 
+## Fitur Backup & Restore
+
+Sistem ini dilengkapi dengan skrip otomatis untuk mem-backup Database, Data Grafik RRD, dan file `.env`.
+
+### 1. Auto Backup & Scheduler
+Secara default, skrip backup menyimpan data selama 7 hari (bisa diubah di dalam file `backup.sh`).
+Untuk menjadwalkan backup harian otomatis jam 02:00 pagi, jalankan perintah berikut di VPS Anda:
+
+```bash
+crontab -e
+```
+
+Tambahkan baris berikut di paling bawah (pastikan path disesuaikan dengan lokasi observium-docker Anda):
+```bash
+0 2 * * * cd /home/nocswn/observium-docker && bash backup.sh >> backups/backup.log 2>&1
+```
+
+*(Sangat disarankan untuk memindahkan folder `backups/` ke Google Drive / S3 secara berkala menggunakan `rclone` agar aman dari VPS Crash)*
+
+### 2. Cara Restore Data (Disaster Recovery)
+Jika server Anda hancur dan Anda mem-build ulang server baru, ikuti cara ini untuk memulihkan data:
+1. Pindahkan arsip `.tar.gz` dari backup Anda ke server baru.
+2. Clone repository ini dan masuk ke foldernya.
+3. Jalankan script restore:
+```bash
+chmod +x restore.sh
+./restore.sh backups/observium_backup_2026xxxx_xxxx.tar.gz
+```
+Semua database, user, dan grafik akan otomatis kembali normal!
+
 # Manual polling
 docker exec -u www-data observium php /opt/observium/poller.php -h all
 

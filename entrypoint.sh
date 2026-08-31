@@ -179,6 +179,19 @@ chmod 775 /opt/observium/logs
 # ---------------------------------------------------------------------------
 log_info "Setting up cron jobs..."
 
+# INJECTION: Force Observium to load the custom Raisecom script during sensor discovery
+SENSORS_CORE="/opt/observium/includes/discovery/sensors.inc.php"
+CUSTOM_SCRIPT="/opt/observium/includes/discovery/sensors/raisecom-optical-transceiver-mib.inc.php"
+
+if [ -f "$SENSORS_CORE" ]; then
+    if ! grep -q "raisecom-optical-transceiver-mib.inc.php" "$SENSORS_CORE"; then
+        log_info "Injecting custom Raisecom script into sensors.inc.php..."
+        echo "" >> "$SENSORS_CORE"
+        echo "/* CUSTOM RAISECOM SCRIPT INJECTION */" >> "$SENSORS_CORE"
+        echo "if (file_exists('$CUSTOM_SCRIPT')) { include('$CUSTOM_SCRIPT'); }" >> "$SENSORS_CORE"
+    fi
+fi
+
 CRON_FILE="/etc/cron.d/observium"
 cat > "$CRON_FILE" <<'EOCRON'
 # Observium cron jobs

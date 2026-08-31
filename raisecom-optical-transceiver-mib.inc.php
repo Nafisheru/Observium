@@ -2,6 +2,7 @@
 // =====================================================================
 // RAISECOM RAX721 - SENSOR MONITORING FULL (Clean Sensor Names)
 // =====================================================================
+echo "\n[DEBUG] ====== RAISECOM CUSTOM SCRIPT LOADED ======\n";
 $rax721_options = snmp_gen_options('snmpwalk');
 $rax721_data    = snmp_walk($device, '.1.3.6.1.4.1.8886.60.18.1.2', $rax721_options);
 

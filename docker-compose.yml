@@ -21,6 +21,7 @@ services:
       - observium-rrd:/opt/observium/rrd
       - observium-logs:/opt/observium/logs
       - ./raisecom-optical-transceiver-mib.inc.php:/opt/observium/includes/discovery/sensors/raisecom-optical-transceiver-mib.inc.php:ro
+      - ./test_raisecom.php:/opt/observium/test_raisecom.php:ro
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/"]
       interval: 30s

@@ -100,7 +100,7 @@ EOPHP
 
 # Append any extra OBSERVIUM__ environment variables to config.php
 # Format: OBSERVIUM__key1__key2=value -> $config['key1']['key2'] = value;
-env | grep '^OBSERVIUM__' | while IFS='=' read -r key value; do
+env | (grep '^OBSERVIUM__' || true) | while IFS='=' read -r key value; do
     # Skip known non-config variables
     case "$key" in
         OBSERVIUM_ADMIN_USER|OBSERVIUM_ADMIN_PASSWORD|OBSERVIUM_SNMP_COMMUNITY|OBSERVIUM_PORT|OBSERVIUM_FQDN)

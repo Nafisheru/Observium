@@ -1,0 +1,15 @@
+# Environment file (contains passwords)
+.env
+
+# Docker volumes
+data/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

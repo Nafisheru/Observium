@@ -1,0 +1,78 @@
+# =============================================================================
+# Observium Community Edition - Docker Compose
+# =============================================================================
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # Observium Web + Poller (Apache + PHP + Cron)
+  # ---------------------------------------------------------------------------
+  observium:
+    build: .
+    container_name: observium
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${OBSERVIUM_PORT:-8080}:8080"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    volumes:
+      - observium-rrd:/opt/observium/rrd
+      - observium-logs:/opt/observium/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 3
+    networks:
+      - observium-net
+
+  # ---------------------------------------------------------------------------
+  # MariaDB Database
+  # ---------------------------------------------------------------------------
+  mariadb:
+    image: mariadb:11
+    container_name: observium-db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - observium-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+    command: >
+      --innodb-file-per-table=1
+      --lower-case-table-names=0
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+    networks:
+      - observium-net
+
+# =============================================================================
+# Persistent Volumes
+# =============================================================================
+volumes:
+  observium-rrd:
+    name: observium-rrd
+  observium-logs:
+    name: observium-logs
+  observium-db:
+    name: observium-db
+
+# =============================================================================
+# Network
+# =============================================================================
+networks:
+  observium-net:
+    name: observium-net
+    driver: bridge

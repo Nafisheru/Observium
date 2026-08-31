@@ -21,7 +21,7 @@ else
 fi
 
 echo "[+] Dumping Database (observium-db)..."
-docker exec -i observium-db mariadb-dump -u root -p"${MARIADB_ROOT_PASSWORD}" ${DB_NAME:-observium} > "$BACKUP_DIR/db_backup.sql"
+docker exec -i observium-db sh -c 'mariadb-dump -u root -p"$MARIADB_ROOT_PASSWORD" "$MARIADB_DATABASE"' > "$BACKUP_DIR/db_backup.sql"
 
 echo "[+] Archiving RRD Data (this might take a while depending on size)..."
 docker run --rm -v observium-rrd:/rrd -v $(pwd)/$BACKUP_DIR:/backup alpine tar -czf /backup/rrd_backup.tar.gz -C /rrd .

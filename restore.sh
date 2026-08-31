@@ -45,7 +45,7 @@ if ! docker ps | grep -q "observium-db"; then
     exit 1
 fi
 
-docker exec -i observium-db mariadb -u root -p"${MARIADB_ROOT_PASSWORD}" ${DB_NAME:-observium} < "$TMP_DIR/db_backup.sql"
+docker exec -i observium-db sh -c 'mariadb -u root -p"$MARIADB_ROOT_PASSWORD" "$MARIADB_DATABASE"' < "$TMP_DIR/db_backup.sql"
 
 echo "[+] Restoring RRD Data..."
 # Clear existing and extract new
